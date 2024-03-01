@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+    <title>LMAP 天気予報地点設定</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+    <style type="text/css">
+        .buttons {
+            width: 100%%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        input#place {
+            width: 85%%;
+        }
+
+        i#mapicon {
+            display: inline-block;
+            padding: 15px 10px 10px 10px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100svh;
+        }
+
+        header {
+            min-height: 20vh;
+            min-height: 20svh;
+            padding: 20px;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        footer {
+            min-height: 10vh;
+            min-height: 10svh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="container">
+        <header>
+            <p class="title is-4">天気予報地点設定</p>
+        </header>
+        <main>
+            <div class="box">
+                <div class="field">
+                    <label class="label">郵便番号〒から緯度, 経度を取得する</label>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="ハイフンなし、例：1234567" id="postcode">
+                    </div>
+                </div>
+                <span id="placename"></span>
+                <div class="buttons">
+                    <button class="button is-success" id="getplace">取得</button>
+                </div>
+                <div class="field">
+                    <label class="label">緯度, 経度（直接入力も可能）</label>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="35.675848753527646, 139.74478289446475" id="place"
+                            value="%PLACE_INFO%">
+                        <i class="fa-solid fa-map-location-dot fa-lg" id="mapicon"></i>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="button is-success" id="setplace">設定</button>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <blockquote class="cite">
+                出典:<a href="https://nlftp.mlit.go.jp/">「位置参照情報」(国土交通省)</a>の加工情報・
+                <a href="https://geoapi.heartrails.com/">「HeartRails Geo API」(HeartRails Inc.)</a>
+            </blockquote>
+        </footer>
+    </div>
+    <script type="text/javascript">
+        // 緯度経度のテキストボックス
+        const place = document.getElementById("place");
+        const placename = document.getElementById("placename");
+
+        // 取得ボタンクリック
+        const getplace = document.getElementById("getplace");
+        getplace.addEventListener("click", () => {
+            // 入力チェック
+            var postcode = document.getElementById("postcode");
+            if (chkInputPostcode(postcode.value)) {
+                // 郵便番号から位置情報を取得し、テキストボックスに記入する
+                fetch("https://geoapi.heartrails.com/api/json?method=searchByPostal&postal=" + postcode.value).then(res => res.json()).then(data => {
+                    place.value = data.response.location[0].y + ", " + data.response.location[0].x;
+                    placename.innerText = data.response.location[0].city + data.response.location[0].town;
+                });
+            }
+        });
+
+        // 地図アイコンクリック
+        const mapicon = document.getElementById("mapicon");
+        mapicon.addEventListener("click", () => {
+            var mapurl = "https://www.google.com/maps/search/?api=1&query=" + place.value.replace(/\s+/g, "");
+            window.location.href = mapurl;
+        });
+
+        // 設定ボタンクリック
+        const setplace = document.getElementById("setplace");
+        setplace.addEventListener("click", () => {
+            // 入力チェック
+            if (chkInputPlace(place.value)) {
+                // 入力された位置情報を本体に記録する
+                var sp = place.value.replace(" ", "");
+                var ps = sp.split(",");
+                var lat = ps[0];
+                var lon = ps[1];
+                fetch("/setplace?lat=" + lat + "&lon=" + lon);
+                alert("位置情報を更新しました。");
+            }
+        });
+
+        // 郵便番号入力チェック
+        function chkInputPostcode(str) {
+            var chk = /[0-9]{7}$/i;
+            if (str != "") {
+                if (str.match(chk)) {
+                    return true;
+                } else {
+                    alert("郵便番号は半角数字7桁(ハイフンなし)で入力してください。");
+                    return false;
+                }
+            } else {
+                alert("郵便番号を入力してください");
+                return false;
+            }
+        }
+
+        // 緯度経度入力チェック
+        function chkInputPlace(str) {
+            var chk = /[0-9]+\.[0-9]+[,].*[0-9]+\.[0-9]+$/i;
+            if (str != "" && str.length <= 40) {
+                if (str.match(chk)) {
+                    return true;
+                } else {
+                    alert("緯度、経度はカンマ区切りで入力してください。\n例：35.675848753527646, 139.74478289446475");
+                    return false;
+                }
+            }
+            else if (str == "") {
+                alert("緯度、経度を入力してください。");
+                return false;
+            }
+            else if (str.length > 40) {
+                alert("緯度、経度の桁数が多いため、小数点以下の桁数を調整してください。");
+                return false;
+            }
+        }
+    </script>
+</body>
+
+</html>

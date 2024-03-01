@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+    <title>LMAP システム情報</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <style type="text/css">
+        .buttons {
+            width: 100%%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100svh;
+        }
+
+        header {
+            min-height: 10vh;
+            min-height: 10svh;
+            padding: 20px;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        footer {
+            min-height: 10vh;
+            min-height: 10svh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="container">
+        <header>
+            <p class="title is-4">システム情報</p>
+        </header>
+        <main>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>現在値</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CPU温度</td>
+                        <td id="cpu_temp">%CPU_TEMP% ℃</td>
+                    </tr>
+                    <tr>
+                        <td>システム起動日時</td>
+                        <td id="up_time">%UP_TIME%</td>
+                    </tr>
+                    <tr>
+                        <td>システム現在時刻</td>
+                        <td id="now_time">%NOW_TIME%</td>
+                    </tr>
+                    <tr>
+                        <td>Wi-Fi接続時刻</td>
+                        <td id="wifi_up_time">%WIFI_UP_TIME%</td>
+                    </tr>
+                    <tr>
+                        <td>最新天気予報取得時刻</td>
+                        <td id="last_w_time">%LAST_W_TIME%</td>
+                    </tr>
+                    <tr>
+                        <td>MACアドレス</td>
+                        <td id="mac_addr">%MAC_ADDR%</td>
+                    </tr>
+                    <tr>
+                        <td>最大メモリ</td>
+                        <td id="max_mem"></td>
+                    </tr>
+                    <tr>
+                        <td>空きメモリ</td>
+                        <td id="free_mem"></td>
+                    </tr>
+            </table>
+            <div class="buttons">
+                <button class="button is-success" id="restart">再起動</button>
+            </div>
+        </main>
+        <footer>
+        </footer>
+    </div>
+    <script type="text/javascript">
+        // 表示タグの取得
+        const mm = document.getElementById("max_mem");
+        const fm = document.getElementById("free_mem");
+
+        // 最大メモリ(320KB)
+        const max_mem = 327680;
+
+        // 空きメモリ取得
+        var free_mem = %FREE_MEM%;
+
+        // 空き領域の割合を算出
+        var free_per = 100 * free_mem / max_mem;
+
+        // 表示
+        mm.innerText = max_mem.toLocaleString() + " B";
+        fm.innerText = free_mem.toLocaleString() + " B (" + free_per.toFixed(1) + " %)";
+
+        // 再起動処理        
+        const rs = document.getElementById("restart");
+        rs.addEventListener("click", () => {
+            if(window.confirm('LMAPを再起動してよろしいですか？')){
+                fetch("/restart");
+            }
+        });
+    </script>
+</body>
+
+</html>
