@@ -782,7 +782,7 @@ void setup() {
   mxconfig = HUB75_I2S_CFG(PANEL_W, PANEL_H, PANEL_NUM);
   d = new MatrixPanel_I2S_DMA();
   mxconfig.double_buff = true;
-  mxconfig.clkphase = false; // x=0 to x=63の問題がある場合はコメントアウトを外す
+  //mxconfig.clkphase = false; // x=0 to x=63の問題がある場合はコメントアウトを外す
   d->begin(mxconfig);
   d->setBrightness8(high_brightness);
 
