@@ -144,7 +144,7 @@ uint16_t wanko_meal_cnt = 0;                       // わんこ食事秒数カ�
 int16_t wanko_meal_xy[] = { 44, 9 };               // わんこ食事表示位置
 const float wanko_gx = wanko_mv_xywh[X] + (float)wanko_mv_xywh[W] / 2; // わんこの動ける範囲を2分割するX軸
 const float wanko_gy = wanko_mv_xywh[Y] + (float)wanko_mv_xywh[H] / 2; // わんこの動ける範囲を2分割するY軸
-const uint8_t num_meal = sizeof(wanko_meal_hours) / sizeof(int);       // わんこの１日の食事回数
+const uint8_t num_meal = sizeof(wanko_meal_hours) / sizeof(uint8_t);   // わんこの１日の食事回数
 
 //----------------------------------------------------------------
 // おみくじ表示用
